@@ -2,9 +2,28 @@ import { Loan, SummaryStats } from '../types';
 
 const STORAGE_KEY = 'ton_loans_data';
 
-// ดึง URL จาก Environment Variable (ถ้าไม่มีให้ใช้ค่า Default ที่เคยตั้งไว้)
-// Fixed: Using process.env to resolve 'Property env does not exist on type ImportMeta' error
-const APPS_SCRIPT_URL = (process.env as any).VITE_APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbzjdVvyVs6UeiXzMPr4a_RAkQ1PJxnDUyJ65NIRnSx3FORmzw7gP-W2EF_M9i9iPzoQ/exec';
+/**
+ * ดึง URL จาก Environment Variable
+ * รองรับทั้ง Vite (import.meta.env) และสภาพแวดล้อมอื่นๆ
+ */
+const getAppsScriptUrl = (): string => {
+  // ลองดึงจาก Vite env (Vercel มาตรฐาน)
+  try {
+    const viteUrl = (import.meta as any).env?.VITE_APPS_SCRIPT_URL;
+    if (viteUrl) return viteUrl;
+  } catch (e) {}
+
+  // ลองดึงจาก process.env (Node/System)
+  try {
+    const processUrl = (process.env as any).VITE_APPS_SCRIPT_URL;
+    if (processUrl) return processUrl;
+  } catch (e) {}
+
+  // ค่าเริ่มต้นกรณีหาไม่เจอเลย
+  return 'https://script.google.com/macros/s/AKfycbzjdVvyVs6UeiXzMPr4a_RAkQ1PJxnDUyJ65NIRnSx3FORmzw7gP-W2EF_M9i9iPzoQ/exec';
+};
+
+const APPS_SCRIPT_URL = getAppsScriptUrl();
 
 export const dataService = {
   getLoansLocal: (): Loan[] => {

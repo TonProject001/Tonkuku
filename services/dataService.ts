@@ -1,12 +1,14 @@
+/// <reference types="vite/client" />
 import { Loan, SummaryStats } from '../types';
 
 const STORAGE_KEY = 'ton_loans_data';
 
 /**
- * ดึง URL จาก Environment Variable
- * Fix: Use process.env instead of import.meta.env to resolve TypeScript error in this environment
+ * ดึง URL จาก Environment Variable ของ Vite (ต้องขึ้นต้นด้วย VITE_)
+ * ใน Vite จะใช้ import.meta.env แทน process.env
  */
-const APPS_SCRIPT_URL = (process.env as any).VITE_APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbzjdVvyVs6UeiXzMPr4a_RAkQ1PJxnDUyJ65NIRnSx3FORmzw7gP-W2EF_M9i9iPzoQ/exec';
+// Fix: Added triple-slash reference at the top of the file to inform TypeScript about Vite-specific types for import.meta.env
+const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbzjdVvyVs6UeiXzMPr4a_RAkQ1PJxnDUyJ65NIRnSx3FORmzw7gP-W2EF_M9i9iPzoQ/exec';
 
 export const dataService = {
   getLoansLocal: (): Loan[] => {

@@ -58,13 +58,17 @@ const App: React.FC = () => {
     return { activeLoans: active, closedLoans: closed };
   }, [loans, search]);
 
+  const [formData, setFormData] = useState<Partial<Loan>>({ borrowerName: '', type: 'individual', principal: 0, interestAmount: 0, duration: '1month', startDate: new Date().toISOString().split('T')[0], dueDayOfMonth: undefined, status: 'active', payments: [], proofUrl: undefined });
+  const [paymentData, setPaymentData] = useState<Partial<Payment>>({ amount: 0, date: new Date().toISOString().split('T')[0], note: '', slipUrl: undefined });
+  const resetForm = () => setFormData({ borrowerName: '', type: 'individual', principal: 0, interestAmount: 0, duration: '1month', startDate: new Date().toISOString().split('T')[0], dueDayOfMonth: undefined, status: 'active', payments: [], proofUrl: undefined });
+  const stats = useMemo(() => dataService.getStatsByLoans(loans), [loans]);
+
   const handleSaveLoan = async () => {
     if (!formData.borrowerName || !formData.principal) return;
     
     setIsUploading(true);
     let finalProofUrl = formData.proofUrl;
     
-    // ถ้ามีการเลือกรูปหลักฐานใหม่ (เป็น base64) ให้ส่งไป Cloud
     if (finalProofUrl && finalProofUrl.startsWith('data:image')) {
       const driveUrl = await dataService.uploadSlipToCloud(finalProofUrl, `proof_${formData.borrowerName}_${Date.now()}.jpg`);
       if (driveUrl) finalProofUrl = driveUrl;
@@ -169,11 +173,6 @@ const App: React.FC = () => {
     setPaymentData({ amount: 0, date: new Date().toISOString().split('T')[0], note: '', slipUrl: undefined });
   };
 
-  const [formData, setFormData] = useState<Partial<Loan>>({ borrowerName: '', type: 'individual', principal: 0, interestAmount: 0, duration: '1month', startDate: new Date().toISOString().split('T')[0], dueDayOfMonth: undefined, status: 'active', payments: [], proofUrl: undefined });
-  const [paymentData, setPaymentData] = useState<Partial<Payment>>({ amount: 0, date: new Date().toISOString().split('T')[0], note: '', slipUrl: undefined });
-  const resetForm = () => setFormData({ borrowerName: '', type: 'individual', principal: 0, interestAmount: 0, duration: '1month', startDate: new Date().toISOString().split('T')[0], dueDayOfMonth: undefined, status: 'active', payments: [], proofUrl: undefined });
-  const stats = useMemo(() => dataService.getStatsByLoans(loans), [loans]);
-
   return (
     <div className="max-w-md mx-auto min-h-screen pb-32 relative bg-black text-white font-['Kanit']">
       <header className="px-5 pt-10 pb-6 sticky top-0 bg-black/90 backdrop-blur-xl z-30 border-b border-zinc-900">
@@ -227,7 +226,7 @@ const App: React.FC = () => {
               <h3 className="text-2xl font-black text-emerald-400">วิธีซิงค์ข้อมูลข้ามเครื่อง</h3>
               <ol className="text-sm text-zinc-400 space-y-4 list-decimal ml-4">
                  <li>ไปที่ <b>Google Script</b> ของคุณ</li>
-                 <li>กดปุ่ม <b>Deploy</b> (ทำให้ใช้งานได้) → <b>New Deployment</b></li>
+                 <li>กดปุ่ม <b>Deploy</b> (ทำให้ใช้งานได้) &rarr; <b>New Deployment</b></li>
                  <li>เลือก Access เป็น <b>Anyone</b> (ทุกคน)</li>
                  <li>ก๊อปปี้ URL ที่ได้ มาวางในไฟล์ <b>dataService.ts</b></li>
               </ol>
@@ -246,7 +245,7 @@ const App: React.FC = () => {
                 <span className="text-[10px] bg-emerald-500/10 px-2 py-1 rounded-lg text-emerald-400 font-black">{activeLoans.length}</span>
               </div>
               <div className="space-y-4">
-                {activeLoans.map(loan => (
+                {activeLoans.map((loan) => (
                   <LoanCard key={loan.id} loan={loan} onClick={setSelectedLoan} />
                 ))}
                 {activeLoans.length === 0 && !isSyncing && (
@@ -264,7 +263,7 @@ const App: React.FC = () => {
                   <h2 className="text-[11px] font-black text-zinc-600 uppercase tracking-widest flex items-center gap-2"><CheckCircle2 size={14} /> ปิดยอดแล้ว</h2>
                 </div>
                 <div className="opacity-50 grayscale scale-[0.98] origin-top">
-                  {closedLoans.map(loan => (
+                  {closedLoans.map((loan) => (
                     <LoanCard key={loan.id} loan={loan} onClick={setSelectedLoan} />
                   ))}
                 </div>
@@ -351,7 +350,6 @@ const App: React.FC = () => {
                <p className="text-4xl font-black text-black">{formatCurrency(selectedLoan.principal + (selectedLoan.interestAmount || 0))}</p>
             </div>
             
-            {/* ส่วนแสดงหลักฐานปล่อยกู้ */}
             {selectedLoan.proofUrl && (
               <div className="bg-zinc-900/30 p-5 rounded-[2rem] border border-zinc-800">
                 <div className="flex items-center justify-between mb-4">
@@ -384,7 +382,7 @@ const App: React.FC = () => {
                   ยังไม่มีประวัติการชำระ
                 </div>
               ) : (
-                selectedLoan.payments.map(payment => (
+                selectedLoan.payments.map((payment) => (
                   <div key={payment.id} className="bg-zinc-900/50 p-5 rounded-[1.5rem] border border-zinc-800 flex justify-between items-center">
                     <div className="flex items-center gap-4">
                       {payment.slipUrl && (

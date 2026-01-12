@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Loan, LoanType, LoanDuration, Payment } from './types';
 import { dataService } from './services/dataService';
@@ -228,7 +227,7 @@ const App: React.FC = () => {
               <h3 className="text-2xl font-black text-emerald-400">วิธีซิงค์ข้อมูลข้ามเครื่อง</h3>
               <ol className="text-sm text-zinc-400 space-y-4 list-decimal ml-4">
                  <li>ไปที่ <b>Google Script</b> ของคุณ</li>
-                 <li>กดปุ่ม <b>Deploy</b> (ทำให้ใช้งานได้) -> <b>New Deployment</b></li>
+                 <li>กดปุ่ม <b>Deploy</b> (ทำให้ใช้งานได้) → <b>New Deployment</b></li>
                  <li>เลือก Access เป็น <b>Anyone</b> (ทุกคน)</li>
                  <li>ก๊อปปี้ URL ที่ได้ มาวางในไฟล์ <b>dataService.ts</b></li>
               </ol>
@@ -247,7 +246,9 @@ const App: React.FC = () => {
                 <span className="text-[10px] bg-emerald-500/10 px-2 py-1 rounded-lg text-emerald-400 font-black">{activeLoans.length}</span>
               </div>
               <div className="space-y-4">
-                {activeLoans.map(loan => <LoanCard key={loan.id} loan={loan} onClick={setSelectedLoan} />)}
+                {activeLoans.map(loan => (
+                  <LoanCard key={loan.id} loan={loan} onClick={setSelectedLoan} />
+                ))}
                 {activeLoans.length === 0 && !isSyncing && (
                   <div className="text-center py-20 text-zinc-800 bg-zinc-900/10 rounded-[2rem] border-2 border-dashed border-zinc-900 font-bold">
                     <Cloud size={40} className="mx-auto mb-4 opacity-20" />
@@ -262,7 +263,11 @@ const App: React.FC = () => {
                 <div className="flex items-center justify-between mb-4 px-1">
                   <h2 className="text-[11px] font-black text-zinc-600 uppercase tracking-widest flex items-center gap-2"><CheckCircle2 size={14} /> ปิดยอดแล้ว</h2>
                 </div>
-                <div className="opacity-50 grayscale scale-[0.98] origin-top">{closedLoans.map(loan => <LoanCard key={loan.id} loan={loan} onClick={setSelectedLoan} />)}</div>
+                <div className="opacity-50 grayscale scale-[0.98] origin-top">
+                  {closedLoans.map(loan => (
+                    <LoanCard key={loan.id} loan={loan} onClick={setSelectedLoan} />
+                  ))}
+                </div>
               </section>
             )}
           </div>
